@@ -6,9 +6,7 @@ const MONTHS = [
   'July','August','September','October','November','December'
 ];
 
-function getDaysInMonth(month, year) {
-  return new Date(year, month, 0).getDate();
-}
+
 
 export default function SalaryPage() {
   const today = new Date();
