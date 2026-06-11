@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { api, getTodayDateStr, getDateStr, isSunday, STATUS_COLORS } from '../utils/api';
+import { api, getTodayDateStr,isSunday, STATUS_COLORS } from '../utils/api';
 import { useApp } from '../context/AppContext';
 
 const STATUSES = ['P', 'A', 'WO', 'WOP', 'NA'];
