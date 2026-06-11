@@ -1,0 +1,20 @@
+{
+  "short_name": "Raindrops",
+  "name": "Raindrops Attendance",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#c0392b",
+  "background_color": "#0a0a0a"
+}
