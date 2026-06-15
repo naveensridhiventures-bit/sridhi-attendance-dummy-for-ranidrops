@@ -7,6 +7,7 @@ import MarkPage from './pages/MarkPage';
 import AttendancePage from './pages/AttendancePage';
 import SalaryPage from './pages/SalaryPage';
 import EmployeesPage from './pages/EmployeesPage';
+import PermissionPage from './pages/PermissionPage';
 
 function AppInner() {
   const [page, setPage] = useState('home');
@@ -18,6 +19,7 @@ function AppInner() {
       case 'attendance': return <AttendancePage />;
       case 'salary': return <SalaryPage />;
       case 'employees': return <EmployeesPage />;
+      case 'permission': return <PermissionPage />;
       default: return <MarkPage />;
     }
   };
