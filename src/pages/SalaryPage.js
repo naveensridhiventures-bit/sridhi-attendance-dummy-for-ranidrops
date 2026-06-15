@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../utils/api';
+import { useApp } from '../context/AppContext';
 
-export default function SalaryPage({ month, year }) {
+export default function SalaryPage() {
+  const { month, year } = useApp();
   const [rows, setRows]       = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState('');
