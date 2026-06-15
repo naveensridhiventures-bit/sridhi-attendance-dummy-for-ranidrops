@@ -11,8 +11,8 @@ export default function TopBar() {
   return (
     <div className="topbar">
       <div className="topbar-brand">
-        <img src="/icon-192.png" alt="Raindrops" className="topbar-logo" />
-        <span className="topbar-name">Raindrops</span>
+        <img src="/icon-192.png" alt="SRIDHI" className="topbar-logo" />
+        <span className="topbar-name">SRIDHI</span>
       </div>
       <span className="topbar-time">{time}</span>
     </div>
