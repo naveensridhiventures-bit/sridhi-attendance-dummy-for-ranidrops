@@ -19,7 +19,6 @@ export function clearCache(prefix) {
   });
 }
 
-// All requests go as GET params — GAS drops POST body on redirect
 async function call(params) {
   const query = new URLSearchParams(params).toString();
   const cacheKey = query;
@@ -42,15 +41,9 @@ async function call(params) {
 
 export const api = {
   getEmployees: () => call({ action: 'getEmployees' }),
-
-  getAttendance: (month, year) =>
-    call({ action: 'getAttendance', month, year }),
-
-  getSalary: (month, year) =>
-    call({ action: 'getSalary', month, year }),
-
-  getPermissions: (month, year) =>
-    call({ action: 'getPermissions', month, year }),
+  getAttendance: (month, year) => call({ action: 'getAttendance', month, year }),
+  getSalary: (month, year) => call({ action: 'getSalary', month, year }),
+  getPermissions: (month, year) => call({ action: 'getPermissions', month, year }),
 
   markAttendance: (employeeName, date, status, month, year) => {
     clearCache('action=getAttendance');
@@ -89,7 +82,6 @@ export const api = {
   },
 };
 
-// Date helpers
 export function getTodayDateStr(month, year) {
   const today = new Date();
   const monthNames = ['January','February','March','April','May','June',
