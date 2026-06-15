@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../utils/api';
 import { useApp } from '../context/AppContext';
 
-export default function SalaryPage() {
+export default function SalaryPage({ unlockedName }) {
   const { month, year } = useApp();
   const [rows, setRows]       = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,12 @@ export default function SalaryPage() {
     setError('');
     try {
       const data = await api.getSalary(month, year);
-      setRows(data.rows || []);
+      const all = data.rows || [];
+      // Only show the logged-in employee's row
+      const filtered = unlockedName
+        ? all.filter(r => r.name === unlockedName)
+        : all;
+      setRows(filtered);
     } catch (e) {
       setError(e.message);
     } finally {
