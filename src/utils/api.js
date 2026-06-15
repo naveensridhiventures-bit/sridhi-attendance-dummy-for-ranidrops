@@ -1,6 +1,6 @@
 // ── API Configuration ─────────────────────────────────────────
 // Replace this with your deployed Google Apps Script Web App URL
-const API_URL = 'https://script.google.com/macros/s/AKfycbzljhtjJEhCvOSpdmKCqDvxvjAcocNZ-0v9OX5_82U-Hw6LWCqK3D_pZNfxLRdQVOFrfg/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxa8lifBeNvpsQ5vZ2GuABvplyIlc-zS5fnn0AJfqglOjF4f3yUaMX7_feAs-k4H-Pjsg/exec';
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const cache = {};
 
