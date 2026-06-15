@@ -74,6 +74,11 @@ export const api = {
     return call({ action: 'updateAdvance', name, advance });
   },
 
+  updateSalary: (name, salary) => {
+    clearCache('action=getSalary');
+    return call({ action: 'updateSalary', name, salary });
+  },
+
   addPermission: (name, reason, date, hours, month, year) => {
     clearCache('action=getPermissions');
     return call({ action: 'addPermission', name, reason, date, hours, month, year });
