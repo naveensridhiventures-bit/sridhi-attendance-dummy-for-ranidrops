@@ -1,5 +1,5 @@
 // ── API Configuration ─────────────────────────────────────────
-const API_URL = 'https://script.google.com/macros/s/AKfycbx7bJjDcVOQibkug7_K_Na95_LrVZmyahEjggHwMYRRM5iqT9x0QGfRu7cVXUQ2sXmf4g/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbz5dPuhkgOzUX1GwL7TvmVe3j8zUt3moTDqDCW8qqbtxtuhTNELRz42mIx5Ld0OtR-K0Q/exec';
 const CACHE_TTL = 5 * 60 * 1000;
 const cache = {};
 
@@ -24,7 +24,6 @@ async function call(params) {
   const query = new URLSearchParams(params).toString();
   const cacheKey = query;
 
-  // Only cache read actions
   const action = params.action || '';
   const isRead = action.startsWith('get');
   if (isRead) {
