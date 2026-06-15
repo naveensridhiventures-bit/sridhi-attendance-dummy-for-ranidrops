@@ -35,8 +35,11 @@ async function get(params) {
 }
 
 async function post(body) {
-  const query = new URLSearchParams(body).toString();
-  const res = await fetch(`${API_URL}?${query}`);
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(body),
+  });
   if (!res.ok) throw new Error('Network error');
   const data = await res.json();
   if (data.error) throw new Error(data.error);
@@ -57,7 +60,7 @@ export const api = {
 
   markAttendance: (employeeName, date, status, month, year) => {
     clearCache('action=getAttendance');
-    clearCache('action=getStats');
+    clearCache('action=getSalary');
     return post({ action: 'markAttendance', employeeName, date, status, month, year });
   },
 
