@@ -75,6 +75,19 @@ export const api = {
     clearCache('action=getSalary');
     return post({ action: 'updateAdvance', name, advance });
   },
+
+  getPermissions: (month, year) =>
+    get({ action: 'getPermissions', month, year }),
+
+  addPermission: (name, reason, date, hours, month, year) => {
+    clearCache('action=getPermissions');
+    return post({ action: 'addPermission', name, reason, date, hours, month, year });
+  },
+
+  deletePermission: (sno, month, year) => {
+    clearCache('action=getPermissions');
+    return post({ action: 'deletePermission', sno, month, year });
+  },
 };
 
 // Date helpers
