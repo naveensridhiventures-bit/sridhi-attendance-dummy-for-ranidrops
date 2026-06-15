@@ -31,7 +31,7 @@ function formatDate(dateStr) {
   return String(dateStr);
 }
 
-export default function PermissionPage() {
+export default function PermissionPage({ unlockedName }) {
   const today = new Date();
   const [month, setMonth] = useState(today.getMonth() + 1);
   const [year, setYear]   = useState(today.getFullYear());
@@ -44,7 +44,7 @@ export default function PermissionPage() {
 
   // Form state
   const [showForm, setShowForm]   = useState(false);
-  const [form, setForm]           = useState({ name: '', reason: REASONS[0], date: '', hours: '' });
+  const [form, setForm]           = useState({ name: unlockedName || '', reason: REASONS[0], date: '', hours: '' });
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting]   = useState(null);
 
@@ -63,7 +63,11 @@ export default function PermissionPage() {
         api.getPermissions(month, year),
         api.getEmployees(),
       ]);
-      setRecords(permRes.permissions || []);
+      const allPerms = permRes.permissions || [];
+      const filtered = unlockedName
+        ? allPerms.filter(r => r.name === unlockedName)
+        : allPerms;
+      setRecords(filtered);
       setEmployees(empRes.employees || []);
     } catch (e) {
       setError(e.message || 'Failed to load permission data');
