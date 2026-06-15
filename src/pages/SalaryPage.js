@@ -6,8 +6,6 @@ const MONTHS = [
   'July','August','September','October','November','December'
 ];
 
-
-
 export default function SalaryPage() {
   const today = new Date();
   const [month, setMonth] = useState(today.getMonth() + 1);
@@ -18,6 +16,8 @@ export default function SalaryPage() {
   const [expandedRow, setExpandedRow] = useState(null);
   const [advanceEdit, setAdvanceEdit] = useState({});
   const [savingAdvance, setSavingAdvance] = useState({});
+  const [perDayEdit, setPerDayEdit] = useState({});
+  const [savingPerDay, setSavingPerDay] = useState({});
   const [toast, setToast] = useState({ show: false, msg: '', type: '' });
 
   const showToast = (msg, type = 'success') => {
@@ -40,14 +40,11 @@ export default function SalaryPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const handleAdvanceSave = async (name, currentAdvance) => {
+  const handleAdvanceSave = async (name) => {
     const val = advanceEdit[name];
     if (val === undefined || val === '') return;
     const num = parseFloat(val);
-    if (isNaN(num) || num < 0) {
-      showToast('Enter a valid advance amount', 'error');
-      return;
-    }
+    if (isNaN(num) || num < 0) { showToast('Enter a valid advance amount', 'error'); return; }
     setSavingAdvance(s => ({ ...s, [name]: true }));
     try {
       await api.updateAdvance(name, num);
@@ -58,6 +55,25 @@ export default function SalaryPage() {
       showToast(e.message || 'Failed to update advance', 'error');
     } finally {
       setSavingAdvance(s => ({ ...s, [name]: false }));
+    }
+  };
+
+  const handlePerDaySave = async (name) => {
+    const val = perDayEdit[name];
+    if (val === undefined || val === '') return;
+    const num = parseFloat(val);
+    if (isNaN(num) || num < 0) { showToast('Enter a valid per day rate', 'error'); return; }
+    const monthlySalary = Math.round(num * 30);
+    setSavingPerDay(s => ({ ...s, [name]: true }));
+    try {
+      await api.updateSalary(name, monthlySalary);
+      showToast(`Per day rate updated for ${name} (Monthly: ₹${monthlySalary.toLocaleString('en-IN')})`);
+      setPerDayEdit(a => ({ ...a, [name]: undefined }));
+      load();
+    } catch (e) {
+      showToast(e.message || 'Failed to update salary', 'error');
+    } finally {
+      setSavingPerDay(s => ({ ...s, [name]: false }));
     }
   };
 
@@ -103,7 +119,6 @@ export default function SalaryPage() {
         </div>
       )}
 
-      {/* State Views */}
       {loading && (
         <div className="center-msg">
           <div className="spinner" />
@@ -135,16 +150,18 @@ export default function SalaryPage() {
               ? Math.round((row.presentDays / row.workingDays) * 100)
               : 0;
 
+            // live preview: if user typed a new per-day rate, show what monthly would be
+            const livePerDay = perDayEdit[row.name] !== undefined ? parseFloat(perDayEdit[row.name]) || 0 : null;
+            const liveMonthly = livePerDay !== null ? Math.round(livePerDay * 30) : null;
+
             return (
               <div key={row.name} className={`salary-card ${isExpanded ? 'expanded' : ''}`}>
-                {/* Card Header — always visible */}
+                {/* Card Header */}
                 <div
                   className="salary-card-header"
                   onClick={() => setExpandedRow(isExpanded ? null : idx)}
                 >
-                  <div className="emp-avatar">
-                    {(row.name || '?')[0].toUpperCase()}
-                  </div>
+                  <div className="emp-avatar">{(row.name || '?')[0].toUpperCase()}</div>
                   <div className="emp-info">
                     <div className="emp-name">{row.name}</div>
                     <div className="emp-role">{row.role || '—'}</div>
@@ -199,7 +216,7 @@ export default function SalaryPage() {
                       </div>
                       <div className="detail-item">
                         <span className="di-label">Per Day Rate</span>
-                        <span className="di-val">₹{(row.perDayRate || 0).toFixed(0)}</span>
+                        <span className="di-val">₹{(row.perDaySalary || 0).toFixed(0)}</span>
                       </div>
                       <div className="detail-item">
                         <span className="di-label">Earned</span>
@@ -215,7 +232,38 @@ export default function SalaryPage() {
                       </div>
                     </div>
 
-                    {/* Advance Edit */}
+                    {/* ── Per Day Rate Edit ── */}
+                    <div className="advance-edit-section">
+                      <label className="adv-label">
+                        Update Per Day Rate
+                        <span className="adv-hint"> (saves as monthly = per day × 30)</span>
+                      </label>
+                      <div className="adv-row">
+                        <span className="adv-prefix">₹</span>
+                        <input
+                          type="number"
+                          className="adv-input"
+                          placeholder={row.perDaySalary ? row.perDaySalary.toFixed(0) : '0'}
+                          value={perDayEdit[row.name] !== undefined ? perDayEdit[row.name] : ''}
+                          onChange={e => setPerDayEdit(a => ({ ...a, [row.name]: e.target.value }))}
+                          min="0"
+                        />
+                        <button
+                          className="btn-adv-save"
+                          onClick={() => handlePerDaySave(row.name)}
+                          disabled={savingPerDay[row.name] || perDayEdit[row.name] === undefined || perDayEdit[row.name] === ''}
+                        >
+                          {savingPerDay[row.name] ? '…' : 'Save'}
+                        </button>
+                      </div>
+                      {liveMonthly !== null && (
+                        <div className="adv-preview">
+                          → Monthly salary will be set to <strong>₹{liveMonthly.toLocaleString('en-IN')}</strong>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* ── Advance Edit ── */}
                     <div className="advance-edit-section">
                       <label className="adv-label">Update Advance Amount</label>
                       <div className="adv-row">
@@ -230,8 +278,8 @@ export default function SalaryPage() {
                         />
                         <button
                           className="btn-adv-save"
-                          onClick={() => handleAdvanceSave(row.name, row.advance)}
-                          disabled={savingAdvance[row.name] || advanceEdit[row.name] === undefined}
+                          onClick={() => handleAdvanceSave(row.name)}
+                          disabled={savingAdvance[row.name] || advanceEdit[row.name] === undefined || advanceEdit[row.name] === ''}
                         >
                           {savingAdvance[row.name] ? '…' : 'Save'}
                         </button>
@@ -268,7 +316,6 @@ export default function SalaryPage() {
         </div>
       )}
 
-      {/* Toast */}
       {toast.show && (
         <div className={`salary-toast ${toast.type}`}>{toast.msg}</div>
       )}
