@@ -1,7 +1,6 @@
 // ── API Configuration ─────────────────────────────────────────
-// Replace this with your deployed Google Apps Script Web App URL
-const API_URL = 'https://script.google.com/macros/s/AKfycbxGfexdNk2TvlTkF0WnV-qL8gYPxAUdMdLGM42vpFYHCJKextVqTGNf9WYHM2HDucBQAg/exec';
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const API_URL = 'https://script.google.com/macros/s/AKfycbzL65Ba5RR3HvmxXu1_kDxfFuUgxbKjVR01oVbiMoVrtNgku6e_lAzFVO8rY321pkI_lw/exec';
+const CACHE_TTL = 5 * 60 * 1000;
 const cache = {};
 
 function getCached(key) {
@@ -20,76 +19,69 @@ export function clearCache(prefix) {
   });
 }
 
-async function get(params) {
+// All requests go as GET params — GAS drops POST body on redirect
+async function call(params) {
   const query = new URLSearchParams(params).toString();
   const cacheKey = query;
-  const cached = getCached(cacheKey);
-  if (cached) return cached;
+
+  // Only cache read actions
+  const action = params.action || '';
+  const isRead = action.startsWith('get');
+  if (isRead) {
+    const cached = getCached(cacheKey);
+    if (cached) return cached;
+  }
 
   const res = await fetch(`${API_URL}?${query}`);
   if (!res.ok) throw new Error('Network error');
   const data = await res.json();
   if (data.error) throw new Error(data.error);
-  setCache(cacheKey, data);
-  return data;
-}
 
-async function post(body) {
-  const res = await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error('Network error');
-  const data = await res.json();
-  if (data.error) throw new Error(data.error);
+  if (isRead) setCache(cacheKey, data);
   return data;
 }
 
 export const api = {
-  getEmployees: () => get({ action: 'getEmployees' }),
+  getEmployees: () => call({ action: 'getEmployees' }),
 
   getAttendance: (month, year) =>
-    get({ action: 'getAttendance', month, year }),
+    call({ action: 'getAttendance', month, year }),
 
   getSalary: (month, year) =>
-    get({ action: 'getSalary', month, year }),
+    call({ action: 'getSalary', month, year }),
 
-  getStats: (month, year) =>
-    get({ action: 'getStats', month, year }),
+  getPermissions: (month, year) =>
+    call({ action: 'getPermissions', month, year }),
 
   markAttendance: (employeeName, date, status, month, year) => {
     clearCache('action=getAttendance');
     clearCache('action=getSalary');
-    return post({ action: 'markAttendance', employeeName, date, status, month, year });
+    return call({ action: 'markAttendance', employeeName, date, status, month, year });
   },
 
   addEmployee: (name, role, salary, password) => {
     clearCache('action=getEmployees');
-    return post({ action: 'addEmployee', name, role, salary, password });
+    return call({ action: 'addEmployee', name, role, salary, password });
   },
 
   deleteEmployee: (name) => {
     clearCache('action=getEmployees');
-    return post({ action: 'deleteEmployee', name });
+    return call({ action: 'deleteEmployee', name });
   },
 
   updateAdvance: (name, advance) => {
     clearCache('action=getSalary');
-    return post({ action: 'updateAdvance', name, advance });
+    return call({ action: 'updateAdvance', name, advance });
   },
-
-  getPermissions: (month, year) =>
-    get({ action: 'getPermissions', month, year }),
 
   addPermission: (name, reason, date, hours, month, year) => {
     clearCache('action=getPermissions');
-    return post({ action: 'addPermission', name, reason, date, hours, month, year });
+    return call({ action: 'addPermission', name, reason, date, hours, month, year });
   },
 
   deletePermission: (sno, month, year) => {
     clearCache('action=getPermissions');
-    return post({ action: 'deletePermission', sno, month, year });
+    return call({ action: 'deletePermission', sno, month, year });
   },
 };
 
@@ -122,9 +114,9 @@ export function isSunday(day, month, year) {
 }
 
 export const STATUS_COLORS = {
-  P: { bg: '#dcfce7', text: '#15803d', dot: '#22c55e', label: 'Present' },
-  A: { bg: '#fee2e2', text: '#dc2626', dot: '#ef4444', label: 'Absent' },
-  WO: { bg: '#fef9c3', text: '#a16207', dot: '#eab308', label: 'Week Off' },
+  P:   { bg: '#dcfce7', text: '#15803d', dot: '#22c55e', label: 'Present' },
+  A:   { bg: '#fee2e2', text: '#dc2626', dot: '#ef4444', label: 'Absent' },
+  WO:  { bg: '#fef9c3', text: '#a16207', dot: '#eab308', label: 'Week Off' },
   WOP: { bg: '#f3e8ff', text: '#7e22ce', dot: '#a855f7', label: 'Worked WO' },
-  NA: { bg: '#f1f5f9', text: '#64748b', dot: '#94a3b8', label: 'N/A' },
+  NA:  { bg: '#f1f5f9', text: '#64748b', dot: '#94a3b8', label: 'N/A' },
 };
