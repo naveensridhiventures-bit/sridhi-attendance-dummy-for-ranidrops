@@ -1,5 +1,5 @@
 // ── API Configuration ─────────────────────────────────────────
-const API_URL = 'https://script.google.com/macros/s/AKfycbxj8PaszL2DvJLSjh4oYrVRA4V4H1UgY41Gu2lypcCpa6AWYZkNQ-iD-YOsLtOlFz6M6w/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbx7bJjDcVOQibkug7_K_Na95_LrVZmyahEjggHwMYRRM5iqT9x0QGfRu7cVXUQ2sXmf4g/exec';
 const CACHE_TTL = 5 * 60 * 1000;
 const cache = {};
 
